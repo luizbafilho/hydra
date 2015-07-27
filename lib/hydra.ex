@@ -9,6 +9,7 @@ defmodule Hydra do
     children = [
       # Define workers and child supervisors to be supervised
       # worker(HTTPoison, [arg1, arg2, arg3])
+      supervisor(Task.Supervisor, [[name: Hydra.UsersSupervisor]])
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
@@ -23,15 +24,9 @@ defmodule Hydra do
 
   def parse_args(args) do
     {_, [num, link], _} = OptionParser.parse(args)
-    HTTPoison.start
     {n, _} = Integer.parse(num)
-    {time, _} = :timer.tc(fn ->
-      Enum.reduce(1..n, 0, fn(_, _) ->
-        HTTPoison.get!(link,%{}, stream_to: self)
-        0
-      end)
-    end, [])
 
-    IO.puts inspect time/1000000
+    Hydra.UsersPool.start_users(2, "/ping")
+    :timer.sleep(60*1000)
   end
 end
