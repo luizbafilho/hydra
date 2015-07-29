@@ -19,14 +19,21 @@ defmodule Hydra do
   end
 
   def main(args) do
-    args |> parse_args
+    args |> parse_args |> process
+  end
+
+  def process({[users: users, time: time], link}) do
+    Hydra.UsersPool.start_users(users, "/ping")
+    IO.puts "Running the benckmark..."
+    :timer.sleep(time*1000)
+    IO.puts "Benchmark Done!"
   end
 
   def parse_args(args) do
-    {_, [num, link], _} = OptionParser.parse(args)
-    {n, _} = Integer.parse(num)
-
-    Hydra.UsersPool.start_users(2, "/ping")
-    :timer.sleep(60*1000)
+    {options, [link], _} =  OptionParser.parse(args,
+      switches: [users: :integer, time: :integer],
+      aliases: [u: :users, t: :time]
+    )
+    {options, link}
   end
 end
