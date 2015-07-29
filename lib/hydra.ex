@@ -23,7 +23,7 @@ defmodule Hydra do
   end
 
   def process({[users: users, time: time], link}) do
-    Hydra.UsersPool.start_users(users, "/ping")
+    Hydra.UsersPool.start_users(users, link)
     IO.puts "Running the benckmark..."
     :timer.sleep(time*1000)
     IO.puts "Benchmark Done!"
