@@ -11,7 +11,6 @@ defmodule Hydra.User do
     host = String.to_char_list(uri.host)
 
     {:ok, socket} = :gen_tcp.connect(host, uri.port, opts)
-    IO.puts inspect socket
     {socket, uri}
   end
 

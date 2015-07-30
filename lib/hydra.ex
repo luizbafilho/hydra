@@ -19,14 +19,31 @@ defmodule Hydra do
   end
 
   def main(args) do
+    :observer.start
     args |> parse_args |> process
   end
 
   def process({[users: users, time: time], link}) do
     Hydra.UsersPool.start_users(users, link)
-    IO.puts "Running the benckmark..."
+    IO.puts """
+    Running #{time}s test with #{users} users @ #{link}
+    """
     :timer.sleep(time*1000)
+    print_stats(time)
     IO.puts "Benchmark Done!"
+  end
+
+  def print_stats(time) do
+    reqs = Hydra.Stats.all
+
+    count = Enum.count(reqs)
+
+    msg = """
+      Reqs/Sec #{count/time}
+
+      #{count} requests in #{time}s
+    """
+    IO.puts msg
   end
 
   def parse_args(args) do

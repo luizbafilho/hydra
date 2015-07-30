@@ -9,7 +9,7 @@ defmodule Hydra.UsersPool do
     supervise([], strategy: :one_for_one)
   end
 
-  def start_users(0, _), do: IO.puts "All users started!"
+  def start_users(0, _), do: :ok
   def start_users(n, link) do
     Task.Supervisor.start_child(Hydra.UsersSupervisor, fn ->
       Hydra.User.start(link)
