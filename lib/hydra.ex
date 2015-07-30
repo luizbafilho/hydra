@@ -32,13 +32,36 @@ defmodule Hydra do
     IO.puts "Benchmark Done!"
   end
 
+  defp formatted_diff(diff) when diff > 1000 do
+    time = diff/1000
+    cond do
+      is_float(time) ->
+        [time |> Float.to_string(decimals: 2), "ms"]
+      is_integer(time) ->
+        [time |> Integer.to_string, "ms"]
+    end
+  end
+
+  defp formatted_diff(diff) when is_float(diff), do: [diff |> Float.to_string(decimals: 2), "µs"]
+  defp formatted_diff(diff) when is_integer(diff), do: [diff |> Integer.to_string, "µs"]
+
   def print_stats(time) do
     reqs = Hydra.Stats.all
-
+    latency = Stream.map(reqs, fn ({latency, _}) -> latency end)
     count = Enum.count(reqs)
 
+    stdev = latency |> Statistics.stdev
+    avg   = latency |> Statistics.trimmed_mean(:iqr)
+    min   = latency |> Statistics.min
+    max   = latency |> Statistics.max
+
+
     msg = """
-      Reqs/Sec #{count/time}
+      Latency:     #{formatted_diff(avg)} (Avg)
+      Stdev:       #{formatted_diff(stdev)}
+      Min:         #{formatted_diff(min)}
+      Max:         #{formatted_diff(max)}
+      Reqs/Sec:    #{count/time}
 
       #{count} requests in #{time}s
     """
