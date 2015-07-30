@@ -28,6 +28,7 @@ defmodule Hydra do
     Running #{time}s test with #{users} users @ #{link}
     """
     :timer.sleep(time*1000)
+    Hydra.UsersPool.terminate_users
     print_stats(time)
     IO.puts "Benchmark Done!"
   end

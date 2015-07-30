@@ -16,5 +16,8 @@ defmodule Hydra.UsersPool do
     end)
     start_users(n - 1, link)
   end
-end
 
+  def terminate_users do
+    Supervisor.which_children(Hydra.UsersSupervisor) |> Enum.each(fn ({_,u, _, _}) -> Process.exit(u, :kill)  end)
+  end
+end
