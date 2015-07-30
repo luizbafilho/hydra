@@ -16,10 +16,5 @@ defmodule Hydra.UsersPool do
     end)
     start_users(n - 1, link)
   end
-
-  # def start_requests do
-  #   count = Supervisor.count_children(Hydra.UsersSupervisor)
-  #   IO.puts inspect count
-  # end
 end
 

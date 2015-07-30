@@ -8,7 +8,7 @@ defmodule Hydra do
 
     children = [
       # Define workers and child supervisors to be supervised
-      # worker(HTTPoison, [arg1, arg2, arg3])
+      worker(Hydra.Stats, []),
       supervisor(Task.Supervisor, [[name: Hydra.UsersSupervisor]])
     ]
 

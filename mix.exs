@@ -20,7 +20,7 @@ defmodule Hydra.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:httpoison],
+    [applications: [:timex],
      mod: {Hydra, []}]
   end
 
@@ -34,6 +34,6 @@ defmodule Hydra.Mixfile do
   #
   # Type `mix help deps` for more examples and options
   defp deps do
-    [{:httpoison, "~> 0.7"}]
+    [{:timex, "~> 0.16.2"}]
   end
 end

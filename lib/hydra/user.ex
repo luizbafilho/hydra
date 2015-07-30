@@ -1,4 +1,5 @@
 defmodule Hydra.User do
+  use Timex
 
   ## Public API
   def start(link) do
@@ -15,8 +16,13 @@ defmodule Hydra.User do
   end
 
   def request({socket, uri}) do
-    :gen_tcp.send(socket, "GET #{uri.path} HTTP/1.1\r\n\r\n")
-    :gen_tcp.recv(socket, 0)
+    {latency, _} = :timer.tc(fn ->
+      :gen_tcp.send(socket, "GET #{uri.path} HTTP/1.1\r\n\r\n")
+      :gen_tcp.recv(socket, 0)
+    end)
+
+    {_, time, _} = Time.now
+    Hydra.Stats.insert({latency/1000, time})
 
     request({socket, uri})
   end
