@@ -19,7 +19,6 @@ defmodule Hydra do
   end
 
   def main(args) do
-    :observer.start
     args |> parse_args |> process
   end
 
