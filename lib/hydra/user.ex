@@ -8,7 +8,8 @@ defmodule Hydra.User do
 
   def request(link) do
     {latency, _} = :timer.tc(fn ->
-      :ibrowse.send_req(String.to_char_list(link), [], :get)
+      {ok, status_code, headers, ref} = :hackney.request(:get, String.to_char_list(link), [], '', [])
+      :hackney.body(ref)
     end)
 
     {_, time, _} = Time.now
