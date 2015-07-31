@@ -48,14 +48,15 @@ defmodule Hydra do
 
   def print_stats(time) do
     reqs = Hydra.Stats.all
+
     latency = Stream.map(reqs, fn ({latency, _}) -> latency end)
     count = Enum.count(reqs)
 
+    IO.puts "Collecting Stats...\n"
     stdev = latency |> Statistics.stdev
-    avg   = latency |> Statistics.trimmed_mean(:iqr)
-    min   = latency |> Statistics.min
-    max   = latency |> Statistics.max
-
+    avg   = (latency |> Enum.sum)/count
+    min   = latency |> Enum.min
+    max   = latency |> Enum.max
 
     msg = """
       Latency:     #{formatted_diff(avg)} (Avg)
