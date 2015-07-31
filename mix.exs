@@ -38,7 +38,7 @@ defmodule Hydra.Mixfile do
     [
       {:timex, "~> 0.16.2"},
       {:statistics, "~> 0.2.0"},
-      {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.1"}
+      {:ibrowse, github: "cmullaparthi/ibrowse", branch: "master"}
     ]
   end
 end

@@ -1,4 +1,4 @@
-%{"ibrowse": {:git, "git://github.com/cmullaparthi/ibrowse.git", "d2e369ff42666c3574b8b7ec26f69027895c4d94", [tag: "v4.1.1"]},
+%{"ibrowse": {:git, "git://github.com/cmullaparthi/ibrowse.git", "5ee4a806611fcf25cc74155871571e9983a0d0fc", [branch: "master"]},
   "statistics": {:hex, :statistics, "0.2.3"},
   "timex": {:hex, :timex, "0.16.2"},
   "tzdata": {:hex, :tzdata, "0.1.6"}}
