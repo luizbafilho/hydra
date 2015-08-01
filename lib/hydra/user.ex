@@ -3,18 +3,24 @@ defmodule Hydra.User do
 
   ## Public API
   def start(link) do
-    link |> request
+    connect |> request(link)
   end
 
-  def request(link) do
+  def connect do
+    {:ok, conn} = :hackney.connect(:hackney_tcp_transport, << "localhost" >>, 8080, [])
+    conn
+  end
+
+  def request(conn, link) do
     {latency, _} = :timer.tc(fn ->
-      {ok, status_code, headers, ref} = :hackney.request(:get, String.to_char_list(link), [], '', [])
+      opts = {:get, << "/" >>, [], <<>>}
+      {:ok, status_code, headers, ref} = :hackney.send_request(conn, opts)
       :hackney.body(ref)
     end)
 
     {_, time, _} = Time.now
     Hydra.Stats.insert({latency, time})
 
-    request(link)
+    request(conn, link)
   end
 end
