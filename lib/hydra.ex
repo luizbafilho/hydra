@@ -79,7 +79,24 @@ defmodule Hydra do
     |> max_response
     |> reqs_secs(time)
 
-    IO.puts "  #{length(reqs_latency)} requests in #{time}s, #{bytes_to_mb(data_received)} read\n"
+    status_codes(reqs)
+
+    IO.puts "\n  #{length(reqs_latency)} requests in #{time}s, #{bytes_to_mb(data_received)} read\n"
+  end
+
+  defp status_codes(reqs) do
+    codes_map =
+    Enum.map(reqs, fn ({_, _, status_code, _}) -> status_code end)
+    |> Enum.reduce(Map.new, fn (code, map) ->
+        case code do
+          200 -> map
+          _ -> Map.update(map, code, 0, &(&1 + 1))
+        end
+      end)
+
+    if Map.keys(codes_map) |> length > 0, do:
+      IO.puts "  Non 200 responses: "
+      codes_map |> Enum.each(fn({k, v}) -> IO.puts "    #{k} => #{v}" end)
   end
 
   defp average_response(reqs_latency) do
