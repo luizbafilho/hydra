@@ -9,12 +9,12 @@ defmodule Hydra.UsersPool do
     supervise([], strategy: :one_for_one)
   end
 
-  def start_users(0, _), do: :ok
-  def start_users(n, link) do
+  def start_users(0, _, _), do: :ok
+  def start_users(n, link, method) do
     Task.Supervisor.start_child(Hydra.UsersSupervisor, fn ->
-      Hydra.User.start(link)
+      Hydra.User.start(link, method)
     end)
-    start_users(n - 1, link)
+    start_users(n - 1, link, method)
   end
 
   def terminate_users do
