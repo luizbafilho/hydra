@@ -2,11 +2,11 @@ defmodule Hydra.User do
   use Timex
 
   ## Public API
-  def start(link, method) do
+  def start(link, method, payload) do
     http_method = method |> String.downcase |> String.to_atom
     uri = URI.parse(link)
 
-    uri |> connect |> request(http_method)
+    uri |> connect |> request(http_method, payload)
   end
 
   defp connect(uri) do
@@ -14,9 +14,9 @@ defmodule Hydra.User do
     {conn, uri}
   end
 
-  defp request({conn, uri}, http_method) do
+  defp request({conn, uri}, http_method, payload) do
     {latency, response} = :timer.tc(fn ->
-      opts = {http_method, uri.path || "/" , [], <<>>}
+      opts = {http_method, uri.path || "/" , [], payload}
       {:ok, status_code, headers, ref} = :hackney.send_request(conn, opts)
       {:ok, body} = :hackney.body(ref)
       { status_code, headers, body }
@@ -24,7 +24,7 @@ defmodule Hydra.User do
 
     process_request(latency, response)
 
-    request({conn, uri}, http_method)
+    request({conn, uri}, http_method, payload)
   end
 
   defp process_request(latency, {status_code, headers, body}) do

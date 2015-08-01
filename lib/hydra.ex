@@ -1,9 +1,10 @@
 defmodule Hydra do
   use Application
 
-  @default_users 10
-  @default_time 10
-  @default_method "GET"
+  @default_users    10
+  @default_time     10
+  @default_method   "GET"
+  @default_payload  ""
 
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
   # for more information on OTP Applications
@@ -31,25 +32,27 @@ defmodule Hydra do
   end
 
   defp process({parsed, [url], errors}) do
-    users   = Keyword.get(parsed, :users,  @default_users)
-    time    = Keyword.get(parsed, :time,   @default_time)
-    method  = Keyword.get(parsed, :method, @default_method)
+    users   = Keyword.get(parsed, :users,   @default_users)
+    time    = Keyword.get(parsed, :time,    @default_time)
+    method  = Keyword.get(parsed, :method,  @default_method)
+    payload = Keyword.get(parsed, :payload, @default_payload)
     help    = Keyword.get(parsed, :help)
 
     if length(errors) > 0, do: process(:help)
     if help, do: process(:help)
 
-    {users, time, url, method}
+    {users, time, url, method, payload}
   end
 
   defp process(:help) do
     IO.puts """
     Usage: hydra [options] url
       Options:
-        -u, --users   Number of concurrent users. Default: 10 users
-        -t, --time    Duration of benchmark in seconds. Default: 10 seconds
-        -m, --method  Defines the HTTP Method used. Default: GET
-        -h, --help    Displays this help message
+        -u, --users    Number of concurrent users. Default: 10 users
+        -t, --time     Duration of benchmark in seconds. Default: 10 seconds
+        -m, --method   Defines the HTTP Method used. Default: GET
+        -p, --payload  Sets a payload
+        -h, --help     Displays this help message
     """
     System.halt(0)
   end
@@ -58,11 +61,11 @@ defmodule Hydra do
     process(:help)
   end
 
-  defp run({users, time, url, method}) do
+  defp run({users, time, url, method, payload}) do
     IO.puts """
     Running #{time}s test with #{users} users @ #{url}
     """
-    Hydra.UsersPool.start_users(users, url, method)
+    Hydra.UsersPool.start_users(users, url, method, payload)
     :timer.sleep(time*1000)
     Hydra.UsersPool.terminate_users
     time
@@ -138,14 +141,16 @@ defmodule Hydra do
         time: :integer,
         help: :boolean,
         headers: :keep,
-        method: :string
+        method: :string,
+        payload: :string
       ],
       aliases: [
         u: :users,
         t: :time,
         h: :help,
         H: :headers,
-        m: :method
+        m: :method,
+        p: :payload
       ]
     )
   end
