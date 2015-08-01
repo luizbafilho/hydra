@@ -29,12 +29,13 @@ defmodule Hydra do
     |> summarize
   end
 
-  defp process({parsed, [url], _}) do
+  defp process({parsed, [url], errors}) do
     users = Keyword.get(parsed, :users, @default_users)
     time  = Keyword.get(parsed, :time, @default_time)
     help  = Keyword.get(parsed, :help)
 
-    if help, do: process(:true)
+    if length(errors) > 0, do: process(:help)
+    if help, do: process(:help)
 
     {users, time, url}
   end
