@@ -38,10 +38,13 @@ defmodule Hydra do
     payload = Keyword.get(parsed, :payload, @default_payload)
     help    = Keyword.get(parsed, :help)
 
+    headers = Keyword.get_values(parsed, :headers)
+
+
     if length(errors) > 0, do: process(:help)
     if help, do: process(:help)
 
-    {users, time, url, method, payload}
+    {users, time, url, method, payload, headers}
   end
 
   defp process(:help) do
@@ -52,6 +55,7 @@ defmodule Hydra do
         -t, --time     Duration of benchmark in seconds. Default: 10 seconds
         -m, --method   Defines the HTTP Method used. Default: GET
         -p, --payload  Sets a payload
+        -H, --header   Extra header to include in the request. It can be called more than once.
         -h, --help     Displays this help message
     """
     System.halt(0)
@@ -61,11 +65,11 @@ defmodule Hydra do
     process(:help)
   end
 
-  defp run({users, time, url, method, payload}) do
+  defp run({users, time, url, method, payload, headers}) do
     IO.puts """
     Running #{time}s test with #{users} users @ #{url}
     """
-    Hydra.UsersPool.start_users(users, url, method, payload)
+    Hydra.UsersPool.start_users(users, url, method, payload, headers)
     :timer.sleep(time*1000)
     Hydra.UsersPool.terminate_users
     time
