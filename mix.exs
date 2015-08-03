@@ -12,7 +12,7 @@ defmodule Hydra.Mixfile do
   end
 
   def escript do
-    [main_module: Hydra,
+    [main_module: Hydra.CLI,
      path: "bin/hydra",
      embedd_elixir: true]
   end
