@@ -49,9 +49,10 @@ defmodule Hydra.CLI do
     IO.puts """
     Running #{benchmark.time}s test with #{benchmark.users} users @ #{benchmark.url}
     """
-    Hydra.UsersPool.start_users(benchmark)
-    :timer.sleep(benchmark.time*1000)
-    Hydra.UsersPool.terminate_users
+    tasks = Hydra.UsersManager.start_users(benchmark)
+    tasks |> Enum.each(fn task ->
+      Task.await(task, :infinity)
+    end)
 
     benchmark
   end
