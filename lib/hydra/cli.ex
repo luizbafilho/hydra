@@ -21,11 +21,10 @@ defmodule Hydra.CLI do
 
     headers = Keyword.get_values(parsed, :headers)
 
-
     if length(errors) > 0, do: process(:help)
     if help, do: process(:help)
 
-    {users, time, url, method, payload, headers}
+    %{users: users, time: time, url: url, method: method, payload: payload, headers: headers}
   end
 
   defp process(:help) do
@@ -46,17 +45,18 @@ defmodule Hydra.CLI do
     process(:help)
   end
 
-  defp run({users, time, url, method, payload, headers}) do
+  defp run(benchmark) do
     IO.puts """
-    Running #{time}s test with #{users} users @ #{url}
+    Running #{benchmark.time}s test with #{benchmark.users} users @ #{benchmark.url}
     """
-    Hydra.UsersPool.start_users(users, url, method, payload, headers)
-    :timer.sleep(time*1000)
+    Hydra.UsersPool.start_users(benchmark)
+    :timer.sleep(benchmark.time*1000)
     Hydra.UsersPool.terminate_users
-    time
+
+    benchmark
   end
 
-  defp summarize(time) do
+  defp summarize(%{time: time}) do
     IO.puts "Collecting Stats...\n"
 
     reqs = Hydra.Stats.all

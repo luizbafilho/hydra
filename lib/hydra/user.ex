@@ -2,10 +2,10 @@ defmodule Hydra.User do
   use Timex
 
   ## Public API
-  def start(link, method, payload, headers) do
+  def start(%{url: url, method: method, payload: payload, headers: headers}) do
     http_method = method |> String.downcase |> String.to_atom
     http_headers = Enum.map(headers, fn(h) -> String.split(h, ":") |> Enum.map(&String.strip/1) |> List.to_tuple end)
-    uri = URI.parse(link)
+    uri = URI.parse(url)
 
     uri |> connect |> request(http_method, payload, http_headers)
   end
