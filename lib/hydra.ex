@@ -5,7 +5,6 @@ defmodule Hydra do
     import Supervisor.Spec, warn: false
 
     children = [
-      worker(Hydra.Stats, []),
       supervisor(Task.Supervisor, [[name: Hydra.UsersSupervisor]])
     ]
 

@@ -3,11 +3,14 @@ defmodule Hydra.CLI do
   @default_time     10
   @default_method   "GET"
   @default_payload  ""
+  @default_slave    false
+  @default_nodes    nil
 
   def main(args) do
     args
     |> parse_args
     |> process
+    |> connect_nodes
     |> run
     |> summarize
   end
@@ -17,6 +20,8 @@ defmodule Hydra.CLI do
     time    = Keyword.get(parsed, :time,    @default_time)
     method  = Keyword.get(parsed, :method,  @default_method)
     payload = Keyword.get(parsed, :payload, @default_payload)
+    slave   = Keyword.get(parsed, :slave,   @default_slave)
+    nodes   = Keyword.get(parsed, :nodes,   @default_nodes)
     help    = Keyword.get(parsed, :help)
 
     headers = Keyword.get_values(parsed, :headers)
@@ -24,7 +29,7 @@ defmodule Hydra.CLI do
     if length(errors) > 0, do: process(:help)
     if help, do: process(:help)
 
-    %{users: users, time: time, url: url, method: method, payload: payload, headers: headers}
+    %{users: users, time: time, url: url, method: method, payload: payload, headers: headers, slave: slave, nodes: nodes}
   end
 
   defp process(:help) do
@@ -45,10 +50,50 @@ defmodule Hydra.CLI do
     process(:help)
   end
 
-  defp run(benchmark) do
+  defp slave_mode do
     IO.puts """
-    Running #{benchmark.time}s test with #{benchmark.users} users @ #{benchmark.url}
+      Slave mode enabled. Waiting master instructions.
+
+      Press CTRL + C to exit.
     """
+    Node.start(:"slave@127.0.0.1")
+    :timer.sleep(:infinity)
+  end
+
+  defp connect_nodes(benchmark) do
+    if benchmark.slave, do: slave_mode
+
+    master = :"master@127.0.0.1"
+    Node.start(master)
+
+    case benchmark.nodes do
+      nil  -> benchmark |> Map.put(:nodes, [master])
+      nodes ->
+        slaves = benchmark.nodes |> String.split(",") |> Enum.map(&("slave@" <> &1)) |> Enum.map(&String.to_atom/1)
+        slaves |> Enum.each(fn (slave) ->
+          case Node.connect(slave) do
+            :false ->
+              IO.puts """
+              Node connection error:
+
+                Hydra could not connect to: #{slave}
+                Make sure that node is running Hydra in Slave Mode
+
+                $ hydra --slave
+              """
+              System.halt(1)
+            :true -> :ok
+          end
+        end)
+
+        benchmark |> Map.put(:nodes, [master| slaves])
+    end
+  end
+
+  defp run(benchmark) do
+    IO.puts " Running #{benchmark.time}s test with #{benchmark.users} users @ #{benchmark.url}\n"
+    Hydra.Stats.start_link
+
     tasks = Hydra.UsersManager.start_users(benchmark)
     tasks |> Enum.each(fn task ->
       Task.await(task, :infinity)
@@ -62,8 +107,8 @@ defmodule Hydra.CLI do
 
     reqs = Hydra.Stats.all
 
-    reqs_latency = Enum.map(reqs, fn ({_, latency, _, _}) -> latency end)
-    data_received = Stream.map(reqs, fn ({_, _, _, data}) -> data end) |> Enum.sum
+    reqs_latency = Enum.map(reqs, fn ({latency, _, _}) -> latency end)
+    data_received = Stream.map(reqs, fn ({_, _, data}) -> data end) |> Enum.sum
 
     reqs_latency
     |> average_response
@@ -79,7 +124,7 @@ defmodule Hydra.CLI do
 
   defp status_codes(reqs) do
     codes_map =
-    Enum.map(reqs, fn ({_, _, status_code, _}) -> status_code end)
+    Enum.map(reqs, fn ({_, status_code, _}) -> status_code end)
     |> Enum.reduce(Map.new, fn (code, map) ->
         case code do
           200 -> map
@@ -128,7 +173,9 @@ defmodule Hydra.CLI do
         help: :boolean,
         headers: :keep,
         method: :string,
-        payload: :string
+        payload: :string,
+        slave: :boolean,
+        nodes: :string
       ],
       aliases: [
         u: :users,

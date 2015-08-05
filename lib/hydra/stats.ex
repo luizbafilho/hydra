@@ -1,13 +1,19 @@
 defmodule Hydra.Stats do
   def start_link do
-    Agent.start_link(fn -> [] end, name: __MODULE__)
+    {:ok, pid} = Agent.start_link(fn -> [] end)
+    :global.register_name(:stats, pid)
+    :global.sync
   end
 
   def insert(stat) do
-    Agent.update(__MODULE__, &Enum.into(&1, [stat]))
+    Agent.cast(name, &Enum.into(&1, [stat]))
   end
 
   def all do
-    Agent.get(__MODULE__, &(&1), :infinity)
+    Agent.get(name, &(&1), :infinity)
+  end
+
+  defp name do
+    :global.whereis_name(:stats)
   end
 end

@@ -46,11 +46,9 @@ defmodule Hydra.User do
   end
 
   defp process_request({latency, {status_code, headers, body}}) do
-    {_, seconds, _} = :erlang.timestamp
-
     data_received = String.length(:hackney_headers.to_binary(headers) <> body)
 
-    Hydra.Stats.insert({seconds, latency, status_code, data_received})
+    Hydra.Stats.insert({latency, status_code, data_received})
   end
 
   defp time_elapsed(started) do

@@ -1,7 +1,9 @@
 defmodule Hydra.UsersManager do
   def start_users(%{users: users} = benchmark) do
-    0..users |> Enum.map(fn(_) ->
-      Task.Supervisor.async(Hydra.UsersSupervisor, Hydra.User, :start, [benchmark])
+    Enum.flat_map(benchmark.nodes, fn node ->
+      Enum.map(0..users, fn _ ->
+        Task.Supervisor.async({Hydra.UsersSupervisor, node}, Hydra.User, :start, [benchmark])
+      end)
     end)
   end
 
