@@ -15,6 +15,26 @@ defmodule Hydra.CLI do
     |> summarize
   end
 
+  defp process({[slave: true], _, _errors}) do
+    IO.puts """
+    When running in slave mode yout must define your IP address using the --inet option.
+      $ hydra --slave --inet 127.0.0.1
+    """
+    System.halt(0)
+  end
+
+  defp process({[slave: true, inet: inet], _, _errors}) do
+    slave = "slave@" <> inet |> String.to_atom
+    Node.start(slave)
+    IO.puts """
+    Slave mode enabled @ #{inet}. Waiting master instructions.
+
+    Press CTRL + C to exit.
+    """
+
+    :timer.sleep(:infinity)
+  end
+
   defp process({parsed, [url], errors}) do
     users   = Keyword.get(parsed, :users,   @default_users)
     time    = Keyword.get(parsed, :time,    @default_time)
@@ -50,18 +70,8 @@ defmodule Hydra.CLI do
     process(:help)
   end
 
-  defp slave_mode do
-    IO.puts """
-    Slave mode enabled. Waiting master instructions.
-
-    Press CTRL + C to exit.
-    """
-    Node.start(:"slave@127.0.0.1")
-    :timer.sleep(:infinity)
-  end
-
   defp connect_nodes(benchmark) do
-    if benchmark.slave, do: slave_mode
+    # if benchmark.slave, do: slave_mode
 
     master = :"master@127.0.0.1"
     Node.start(master)
@@ -183,7 +193,8 @@ defmodule Hydra.CLI do
         method: :string,
         payload: :string,
         slave: :boolean,
-        nodes: :string
+        nodes: :string,
+        inet: :string
       ],
       aliases: [
         u: :users,
