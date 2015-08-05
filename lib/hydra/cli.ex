@@ -52,9 +52,9 @@ defmodule Hydra.CLI do
 
   defp slave_mode do
     IO.puts """
-      Slave mode enabled. Waiting master instructions.
+    Slave mode enabled. Waiting master instructions.
 
-      Press CTRL + C to exit.
+    Press CTRL + C to exit.
     """
     Node.start(:"slave@127.0.0.1")
     :timer.sleep(:infinity)
@@ -68,30 +68,38 @@ defmodule Hydra.CLI do
 
     case benchmark.nodes do
       nil  -> benchmark |> Map.put(:nodes, [master])
-      nodes ->
+      _nodes ->
         slaves = benchmark.nodes |> String.split(",") |> Enum.map(&("slave@" <> &1)) |> Enum.map(&String.to_atom/1)
-        slaves |> Enum.each(fn (slave) ->
-          case Node.connect(slave) do
-            :false ->
-              IO.puts """
-              Node connection error:
-
-                Hydra could not connect to: #{slave}
-                Make sure that node is running Hydra in Slave Mode
-
-                $ hydra --slave
-              """
-              System.halt(1)
-            :true -> :ok
-          end
-        end)
+        slaves |> do_connect_nodes
 
         benchmark |> Map.put(:nodes, [master| slaves])
     end
   end
 
+  defp do_connect_nodes(slaves) do
+    slaves |> Enum.each(fn (slave) ->
+      case Node.connect(slave) do
+        :false ->
+          slave |> show_error_connection_msg
+          System.halt(1)
+        :true -> :ok
+      end
+    end)
+  end
+
+  defp show_error_connection_msg(slave) do
+    IO.puts """
+    Node connection error:
+
+      Hydra could not connect to: #{slave}
+      Make sure that node is running Hydra in Slave Mode
+
+      $ hydra --slave
+    """
+  end
+
   defp run(benchmark) do
-    IO.puts " Running #{benchmark.time}s test with #{benchmark.users} users @ #{benchmark.url}\n"
+    IO.puts "Running #{benchmark.time}s test with #{benchmark.users} users @ #{benchmark.url}\n"
     Hydra.Stats.start_link
 
     tasks = Hydra.UsersManager.start_users(benchmark)
