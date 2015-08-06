@@ -7,12 +7,18 @@ defmodule Hydra.CLI do
   @default_nodes    nil
 
   def main(args) do
+    start_epmd
+
     args
     |> parse_args
     |> process
     |> connect_nodes
     |> run
     |> summarize
+  end
+
+  defp start_epmd do
+    :os.cmd('$(which epmd) -daemon')
   end
 
   defp process({[slave: true], _, _errors}) do
