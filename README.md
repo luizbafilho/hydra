@@ -56,6 +56,8 @@ Usage: hydra [options] url
 
 ## Distributed
 
+First of all, make sure the `epmd` daemon is running. To do that run `epmd -daemon`. This daemon acts as a name server on all hosts involved in distributed Erlang computations.
+
 To run a distributed benchmark, go to your slaves nodes and run Hydra in Slave Mode
 
 ```
