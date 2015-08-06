@@ -26,6 +26,7 @@ defmodule Hydra.CLI do
   defp process({[slave: true, inet: inet], _, _errors}) do
     slave = "slave@" <> inet |> String.to_atom
     Node.start(slave)
+    Node.set_cookie(:hydra)
     IO.puts """
     Slave mode enabled @ #{inet}. Waiting master instructions.
 
@@ -71,10 +72,9 @@ defmodule Hydra.CLI do
   end
 
   defp connect_nodes(benchmark) do
-    # if benchmark.slave, do: slave_mode
-
     master = :"master@127.0.0.1"
     Node.start(master)
+    Node.set_cookie(:hydra)
 
     case benchmark.nodes do
       nil  -> benchmark |> Map.put(:nodes, [master])
