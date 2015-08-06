@@ -10,7 +10,7 @@ It is the simplest distributed http benchmark tool you can find on the internet.
 #### Elixir
 Install Elixir in order to be able to build the project. To do that, follow the link: [Elixir Installation](http://elixir-lang.org/install.html)
 
-### Building
+#### Building
 
 1 - Download the project
 ```
