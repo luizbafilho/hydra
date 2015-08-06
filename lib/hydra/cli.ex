@@ -57,12 +57,17 @@ defmodule Hydra.CLI do
     IO.puts """
     Usage: hydra [options] url
       Options:
-        -u, --users    Number of concurrent users. Default: 10 users
-        -t, --time     Duration of benchmark in seconds. Default: 10 seconds
+        -u, --users    Number of concurrent users. Default: 10
+        -t, --time     Duration of benchmark in seconds. Default: 10
         -m, --method   Defines the HTTP Method used. Default: GET
-        -p, --payload  Sets a payload
+        -p, --payload  Sets a payload.
         -H, --header   Extra header to include in the request. It can be called more than once.
-        -h, --help     Displays this help message
+            --nodes    Defines the slaves nodes to run a distributed benchmark. You can specify
+                       as much nodes you want. Ex. --nodes 172.20.21.2,172.20.21.3
+            --slave    Starts Hydra in Slave Mode.
+            --inet     Option required when running in Slave Mode. It defines the ip address
+                       that is accessible to the master node.
+        -h, --help     Displays this help message.
     """
     System.halt(0)
   end
