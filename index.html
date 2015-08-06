@@ -85,6 +85,8 @@
 <h2>
 <a id="distributed" class="anchor" href="#distributed" aria-hidden="true"><span class="octicon octicon-link"></span></a>Distributed</h2>
 
+<p>First of all, make sure the <code>epmd</code> daemon is running. To do that run <code>epmd -daemon</code>. This daemon acts as a name server on all hosts involved in distributed Erlang computations.</p>
+
 <p>To run a distributed benchmark, go to your slaves nodes and run Hydra in Slave Mode</p>
 
 <pre><code>$ hydra --slave --inet 172.20.1.1
