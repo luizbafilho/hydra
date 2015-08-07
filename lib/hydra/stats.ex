@@ -6,7 +6,7 @@ defmodule Hydra.Stats do
   end
 
   def insert(stat) do
-    Agent.cast(name, &Enum.into(&1, [stat]))
+    Agent.cast(name, Enum, :into, [[stat]])
   end
 
   def all do
