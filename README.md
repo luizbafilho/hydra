@@ -6,9 +6,12 @@ Hydra is a Distributed HTTP Benchmark Tool capable of simulate thousands/ten of 
 It is the simplest distributed http benchmark tool you can find on the internet. No configuration need to run in multiples nodes.
 
 ## Installation
+#### Erlang
+
+Hydra requires Erlang 18. You can download it [here](https://www.erlang-solutions.com/downloads/download-erlang-otp)
 
 #### Elixir
-Install Elixir in order to be able to build the project. To do that, follow the link: [Elixir Installation](http://elixir-lang.org/install.html)
+Install Elixir in order to be able to build the project. [Elixir Installation](http://elixir-lang.org/install.html)
 
 #### Building
 
