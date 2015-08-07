@@ -21,7 +21,7 @@ defmodule Hydra.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:timex, :hackney],
+    [applications: [:hackney],
      mod: {Hydra, []}]
   end
 
@@ -36,7 +36,6 @@ defmodule Hydra.Mixfile do
   # Type `mix help deps` for more examples and options
   defp deps do
     [
-      {:timex, "~> 0.16.2"},
       {:statistics, "~> 0.2.0"},
       {:hackney, github: "benoitc/hackney", tag: "1.3.1"}
     ]

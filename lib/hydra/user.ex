@@ -1,6 +1,4 @@
 defmodule Hydra.User do
-  use Timex
-
   ## Public API
   def start(benchmark) do
 
