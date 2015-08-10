@@ -13,6 +13,7 @@ defmodule Hydra.CLI do
     |> parse_args
     |> process
     |> config_http_client
+    |> validations
     |> connect_nodes
     |> run
     |> summarize
@@ -20,6 +21,34 @@ defmodule Hydra.CLI do
 
   defp start_epmd do
     :os.cmd('$(which epmd) -daemon')
+  end
+
+  defp validations(benchmark) do
+    benchmark
+    |> file_limits
+    |> url_connection
+  end
+
+  defp file_limits(%{users: users} = benchmark) do
+    {limit, _} =:os.cmd('ulimit -n') |> :erlang.iolist_to_binary |> Integer.parse
+    if users >= limit do
+      IO.puts """
+      Hydra is going to open more sockets than your max open files limits permits.
+      That can crash the application. Please update the limit before continue.
+      """
+      System.halt(0)
+    end
+    benchmark
+  end
+
+  defp url_connection(%{url: url} = benchmark) do
+    case :hackney.get(url) do
+      {:error, :econnrefused} ->
+        IO.puts "Destination unreachable."
+        System.halt(0)
+      _ ->
+        benchmark
+    end
   end
 
   defp config_http_client(%{users: users} = benchmark) do
@@ -212,10 +241,12 @@ defmodule Hydra.CLI do
     case errors |> Map.keys |> length do
       0 -> :ok
       _ ->
-        closed  = Map.get(errors, :closed, 0)
-        connect = Map.get(errors, :connect_timeout, 0)
-        timeout = Map.get(errors, :timeout, 0)
-        IO.puts "  Socket errors: closed: #{closed}, connect: #{connect}, timeout: #{timeout}"
+        closed     = Map.get(errors, :closed, 0)
+        connect    = Map.get(errors, :connect_timeout, 0)
+        timeout    = Map.get(errors, :timeout, 0)
+        conn_reset = Map.get(errors, :econnreset, 0)
+
+        IO.puts "  Socket errors: closed: #{closed}, connect: #{connect}, timeout: #{timeout}, conn. reset: #{conn_reset}"
     end
 
   end
