@@ -12,6 +12,7 @@ defmodule Hydra.CLI do
     args
     |> parse_args
     |> process
+    |> config_http_client
     |> connect_nodes
     |> run
     |> summarize
@@ -19,6 +20,12 @@ defmodule Hydra.CLI do
 
   defp start_epmd do
     :os.cmd('$(which epmd) -daemon')
+  end
+
+  defp config_http_client(%{users: users} = benchmark) do
+    options = [{:timeout, 150000}, {:max_connections, users}]
+    :hackney_pool.start_pool(:connections_pool, options)
+    benchmark
   end
 
   defp process({[slave: true], _, _errors}) do

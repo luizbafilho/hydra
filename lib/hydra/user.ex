@@ -4,7 +4,6 @@ defmodule Hydra.User do
 
     benchmark
     |> process_benchmark
-    |> connect
     |> request
 
   end
@@ -12,17 +11,12 @@ defmodule Hydra.User do
   defp process_benchmark(%{time: time, url: url, method: method, payload: payload, headers: headers}) do
     %{
       method: method |> String.downcase |> String.to_atom,
-      uri: URI.parse(url),
+      url: url,
       headers: Enum.map(headers, fn(h) -> String.split(h, ":") |> Enum.map(&String.strip/1) |> List.to_tuple end),
       started: :erlang.monotonic_time,
       payload: payload,
       time: time
     }
-  end
-
-  defp connect(%{uri: uri} = request) do
-    {:ok, conn} = :hackney.connect(:hackney_tcp_transport, uri.host, uri.port, [])
-    request |> Map.put(:conn, conn)
   end
 
   defp request(%{started: started, time: time} = request) do
@@ -34,10 +28,10 @@ defmodule Hydra.User do
     end
   end
 
-  defp do_request(%{conn: conn, method: method, uri: uri, headers: headers, payload: payload}) do
+  defp do_request(%{method: method, url: url, headers: headers, payload: payload}) do
+    opts = [{:pool, :connections_pool}]
     :timer.tc(fn ->
-      opts = {method, uri.path || "/" , headers, payload}
-      {:ok, status_code, headers, ref} = :hackney.send_request(conn, opts)
+      {:ok, status_code, headers, ref} = :hackney.request(method, url, headers, payload, opts)
       {:ok, body} = :hackney.body(ref)
       { status_code, headers, body }
     end)
