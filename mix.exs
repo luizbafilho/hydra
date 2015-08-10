@@ -14,7 +14,7 @@ defmodule Hydra.Mixfile do
   def escript do
     [main_module: Hydra.CLI,
      path: "bin/hydra",
-     embedd_elixir: true]
+     embed_elixir: true]
   end
 
   # Configuration for the OTP application
