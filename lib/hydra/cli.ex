@@ -129,6 +129,7 @@ defmodule Hydra.CLI do
   defp run(benchmark) do
     IO.puts "Running #{benchmark.time}s test with #{benchmark.users} users @ #{benchmark.url}\n"
     Hydra.Stats.start_link
+    Hydra.Errors.start_link
 
     tasks = Hydra.UsersManager.start_users(benchmark)
     tasks |> Enum.each(fn task ->
@@ -152,6 +153,7 @@ defmodule Hydra.CLI do
     |> min_response
     |> max_response
     |> reqs_secs(time)
+    |> socket_errors
 
     status_codes(reqs)
 
@@ -199,6 +201,23 @@ defmodule Hydra.CLI do
 
   defp reqs_secs(reqs_latency, time) do
     IO.puts "  Reqs/Sec:    #{length(reqs_latency)/time}\n"
+  end
+
+  defp socket_errors(_) do
+    errors =
+      Hydra.Errors.all |> Enum.reduce(%{}, fn (error, acc) ->
+        Map.update(acc, error, 1, &(&1 + 1))
+      end)
+
+    case errors |> Map.keys |> length do
+      0 -> :ok
+      _ ->
+        closed  = Map.get(errors, :closed, 0)
+        connect = Map.get(errors, :connect_timeout, 0)
+        timeout = Map.get(errors, :timeout, 0)
+        IO.puts "  Socket errors: closed: #{closed}, connect: #{connect}, timeout: #{timeout}"
+    end
+
   end
 
   def parse_args(args) do
