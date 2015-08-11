@@ -35,36 +35,20 @@
 <p>Hydra requires Erlang 18. You can download it <a href="https://www.erlang-solutions.com/downloads/download-erlang-otp">here</a></p>
 
 <h4>
-<a id="elixir" class="anchor" href="#elixir" aria-hidden="true"><span class="octicon octicon-link"></span></a>Elixir</h4>
+<a id="download" class="anchor" href="#download" aria-hidden="true"><span class="octicon octicon-link"></span></a>Download</h4>
 
-<p>Install Elixir in order to be able to build the project. <a href="http://elixir-lang.org/install.html">Elixir Installation</a></p>
+<p>Download Hydra</p>
 
-<h4>
-<a id="building" class="anchor" href="#building" aria-hidden="true"><span class="octicon octicon-link"></span></a>Building</h4>
-
-<p>1 - Download the project</p>
-
-<pre><code>$ git clone git@github.com:luizbafilho/hydra.git
+<pre><code>$ wget https://github.com/luizbafilho/hydra/releases/download/v0.2/hydra
+$ chmod +x hydra
 </code></pre>
-
-<p>2 - Get the dependencies</p>
-
-<pre><code>$ mix deps.get
-</code></pre>
-
-<p>3 - Build the project</p>
-
-<pre><code>$ mix escript.build
-</code></pre>
-
-<p>After the last step, the binary will be avaliable inside the projects's <code>bin</code> directory.</p>
 
 <h2>
 <a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
 
 <p>To use Hydra, it very simple.</p>
 
-<pre><code>$ bin/hydra http://example.com/ping
+<pre><code>$ ./hydra http://www.example.com
 </code></pre>
 
 <p>That will run with default options, <code>10</code> concurrent users for <code>10</code> seconds.</p>
@@ -101,10 +85,38 @@
 
 <p>Now, in the master node specify which slave node you want to join the benchmark.</p>
 
-<pre><code>$ hydra --nodes 172.20.1.1 http://example.com
+<pre><code>$ hydra --nodes 172.20.1.1 http://www.example.com
 </code></pre>
 
 <p>That will spawn <code>10 users</code> on each node (master and slaves).</p>
+
+<h2>
+<a id="development" class="anchor" href="#development" aria-hidden="true"><span class="octicon octicon-link"></span></a>Development</h2>
+
+<h4>
+<a id="elixir" class="anchor" href="#elixir" aria-hidden="true"><span class="octicon octicon-link"></span></a>Elixir</h4>
+
+<p>Install Elixir in order to be able to build the project. <a href="http://elixir-lang.org/install.html">Elixir Installation</a></p>
+
+<h4>
+<a id="building" class="anchor" href="#building" aria-hidden="true"><span class="octicon octicon-link"></span></a>Building</h4>
+
+<p>1 - Download the project</p>
+
+<pre><code>$ git clone git@github.com:luizbafilho/hydra.git
+</code></pre>
+
+<p>2 - Get the dependencies</p>
+
+<pre><code>$ mix deps.get
+</code></pre>
+
+<p>3 - Build the project</p>
+
+<pre><code>$ mix escript.build
+</code></pre>
+
+<p>After the last step, the binary will be avaliable inside the projects's <code>bin</code> directory.</p>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/luizbafilho/hydra">Hydra</a> is maintained by <a href="https://github.com/luizbafilho">luizbafilho</a>.</span>
