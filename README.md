@@ -10,32 +10,18 @@ It is the simplest distributed http benchmark tool you can find on the internet.
 
 Hydra requires Erlang 18. You can download it [here](https://www.erlang-solutions.com/downloads/download-erlang-otp)
 
-#### Elixir
-Install Elixir in order to be able to build the project. [Elixir Installation](http://elixir-lang.org/install.html)
-
-#### Building
-
-1 - Download the project
+#### Download
+Download Hydra
 ```
-$ git clone git@github.com:luizbafilho/hydra.git
+$ wget https://github.com/luizbafilho/hydra/releases/download/v0.2/hydra
+$ chmod +x hydra
 ```
-2 - Get the dependencies
-```
-$ mix deps.get
-```
-3 - Build the project
-```
-$ mix escript.build
-```
-After the last step, the binary will be avaliable inside the projects's `bin` directory.
-
-
 ## Usage
 
 To use Hydra, it very simple.
 
 ```
-$ bin/hydra http://example.com/ping
+$ ./hydra http://www.example.com
 ```
 
 That will run with default options, `10` concurrent users for `10` seconds.
@@ -71,8 +57,28 @@ The `--inet` options is required in order to enable the master node to reach the
 Now, in the master node specify which slave node you want to join the benchmark.
 
 ```
-$ hydra --nodes 172.20.1.1 http://example.com
+$ hydra --nodes 172.20.1.1 http://www.example.com
 ```
 
 That will spawn `10 users` on each node (master and slaves).
 
+## Development
+
+#### Elixir
+Install Elixir in order to be able to build the project. [Elixir Installation](http://elixir-lang.org/install.html)
+
+#### Building
+
+1 - Download the project
+```
+$ git clone git@github.com:luizbafilho/hydra.git
+```
+2 - Get the dependencies
+```
+$ mix deps.get
+```
+3 - Build the project
+```
+$ mix escript.build
+```
+After the last step, the binary will be avaliable inside the projects's `bin` directory.
