@@ -36,9 +36,17 @@ defmodule Hydra.User do
     start = :erlang.monotonic_time
     case :hackney.request(method, url, headers, payload, opts) do
       {:ok, status_code, headers, ref} ->
-        {:ok, body} = :hackney.body(ref)
+        recv_body(ref, status_code, headers, start)
+      {:error, error} ->
+        {:error, error}
+    end
+  end
+
+  defp recv_body(ref, status_code, headers, start) do
+    case :hackney.body(ref) do
+      {:ok, body} ->
         latency = :erlang.monotonic_time - start
-        {latency, status_code, headers, body }
+        {latency, status_code, headers, body}
       {:error, error} ->
         {:error, error}
     end
