@@ -42,13 +42,27 @@ defmodule Hydra.CLI do
   end
 
   defp url_connection(%{url: url} = benchmark) do
-    case :hackney.get(url) do
+    response = try do
+      :hackney.get(url)
+    catch
+      :exit, :badarg -> halt "Invalid URL: #{url}"
+    rescue
+      ArgumentError -> halt "Invalid URL: #{url}"
+    end
+
+    case response do
       {:error, :econnrefused} ->
-        IO.puts "Unable to connect to #{url}. Connection refused."
-        System.halt(0)
+        halt "Unable to connect to #{url}. Connection refused."
+      {:error, :nxdomain} ->
+        halt "Invalid URL: #{url}"
       _ ->
         benchmark
     end
+  end
+
+  defp halt(message) do
+    IO.puts message
+    exit(:shutdown)
   end
 
   defp config_http_client(%{users: users} = benchmark) do

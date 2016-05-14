@@ -4,7 +4,7 @@ defmodule Hydra.Mixfile do
   def project do
     [app: :hydra,
      version: "0.0.1",
-     elixir: "~> 1.0",
+     elixir: "~> 1.2.4",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      escript: escript,
@@ -36,8 +36,8 @@ defmodule Hydra.Mixfile do
   # Type `mix help deps` for more examples and options
   defp deps do
     [
-      {:statistics, "~> 0.2.0"},
-      {:hackney, github: "benoitc/hackney", tag: "1.3.1"}
+      {:statistics, "~> 0.4.0"},
+      {:hackney, github: "benoitc/hackney", tag: "1.6.0"}
     ]
   end
 end
